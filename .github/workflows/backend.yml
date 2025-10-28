@@ -52,10 +52,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository | toLowerCase }}/backend:latest
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/backend:latest"
+          echo "Building image $IMAGE_NAME"
           docker build -t $IMAGE_NAME ./backend
 
       - name: Push Docker image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository | toLowerCase }}/backend:latest
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/backend:latest"
           docker push $IMAGE_NAME
