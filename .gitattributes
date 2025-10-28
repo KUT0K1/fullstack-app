@@ -1,0 +1,71 @@
+# Auto detect text files and perform LF normalization
+*               text=auto
+
+#
+# The above will handle all files NOT found below
+#
+
+# Java sources
+*.java          text diff=java
+*.groovy        text diff=java
+*.scala         text diff=java
+*.gradle        text diff=java
+*.kt            text diff=kotlin
+*.gradle.kts    text diff=kotlin
+
+# These files are text and should be normalized (Convert crlf => lf)
+*.css           text diff=css
+*.scss          text diff=css
+*.sass          text
+*.df            text
+*.htm           text diff=html
+*.html          text diff=html
+*.js            text
+*.jsx           text
+*.mjs           text
+*.cjs           text
+*.jsp           text
+*.jspf          text
+*.jspx          text
+*.properties    text
+*.tld           text
+*.tag           text
+*.tagx          text
+*.txt           text
+*.sql           text
+*.md            text diff=markdown
+*.mdx           text diff=markdown
+
+# Common build-tool wrapper scripts
+mvnw            text eol=lf
+gradlew         text eol=lf
+
+# Scripts
+*.bash          text eol=lf
+*.fish          text eol=lf
+*.ksh           text eol=lf
+*.sh            text eol=lf
+*.zsh           text eol=lf
+# These are explicitly windows files and should use crlf
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=crlf
+
+# Serialisation
+*.json          text
+*.toml          text
+*.xml           text
+*.yaml          text
+*.yml           text
+
+# These files are binary and should be left untouched
+# (binary is a macro for -text -diff)
+*.class         binary
+*.dll           binary
+*.ear           binary
+*.jar           binary
+*.so            binary
+*.war           binary
+*.jks           binary
+
+# source: https://github.com/gitattributes/gitattributes/blob/master/
