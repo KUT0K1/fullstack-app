@@ -1,13 +1,15 @@
 name: Frontend CI/CD
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # manuelles Triggern
   push:
     paths:
-      - 'frontend/**'
+      - 'frontend/**'                     # Änderungen am Frontend-Code
+      - '.github/workflows/frontend.yml'  # Änderungen am Workflow selbst
   pull_request:
     paths:
       - 'frontend/**'
+      - '.github/workflows/frontend.yml'
 
 jobs:
   ci:
@@ -45,11 +47,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/frontend:latest"
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')-frontend:latest"
           echo "Building image $IMAGE_NAME"
           docker build -t $IMAGE_NAME ./frontend
 
       - name: Push Docker image
         run: |
-          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/frontend:latest"
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')-frontend:latest"
           docker push $IMAGE_NAME
