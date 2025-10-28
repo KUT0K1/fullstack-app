@@ -58,5 +58,5 @@ jobs:
 
       - name: Push Docker image
         run: |
-          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/backend:latest"
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/backend:latest"
           docker push $IMAGE_NAME
