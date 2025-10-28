@@ -1,6 +1,7 @@
 name: Frontend CI/CD
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'frontend/**'
@@ -44,8 +45,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/frontend:latest ./frontend
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/frontend:latest"
+          echo "Building image $IMAGE_NAME"
+          docker build -t $IMAGE_NAME ./frontend
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}/frontend:latest
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')/frontend:latest"
+          docker push $IMAGE_NAME
