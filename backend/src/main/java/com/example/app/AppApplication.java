@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class AppApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(AppApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(AppApplication.class, args);
+  }
 
-    @RestController
-    @CrossOrigin(origins = "http://localhost:5173")
-    static class HelloController {
-        @GetMapping("/api/hello")
-        public String hello() {
-            return "Hallo vom Spring Boot Backend 👋";
-        }
+  @RestController
+  @CrossOrigin(origins = "http://localhost:5173")
+  static class HelloController {
+    @GetMapping("/api/hello")
+    public String hello() {
+      return "Hallo vom Spring Boot Backend 👋";
     }
+  }
 }
