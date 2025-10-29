@@ -8,7 +8,6 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "ci"
     commit-message:
       prefix: "ci"
       include: "scope"
@@ -23,7 +22,7 @@ updates:
       - "dependencies"
       - "frontend"
     commit-message:
-      prefix: "build"
+      prefix: "frontend"
       include: "scope"
     ignore:
       # Beispiel: Verhindert automatische Updates auf Major-Versionen
@@ -40,7 +39,7 @@ updates:
       - "dependencies"
       - "backend"
     commit-message:
-      prefix: "build"
+      prefix: "backend"
       include: "scope"
     ignore:
       # Beispiel: Verhindert Major-Updates (z. B. Spring Boot 2.x → 3.x)
