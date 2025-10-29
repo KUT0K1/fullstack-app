@@ -24,10 +24,6 @@ updates:
     commit-message:
       prefix: "frontend"
       include: "scope"
-    ignore:
-      # Beispiel: Verhindert automatische Updates auf Major-Versionen
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
 
   # ☕ 3. Backend (Maven / Spring Boot)
   - package-ecosystem: "maven"
@@ -41,7 +37,44 @@ updates:
     commit-message:
       prefix: "backend"
       include: "scope"
-    ignore:
-      # Beispiel: Verhindert Major-Updates (z. B. Spring Boot 2.x → 3.x)
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+
+  # 🐳 4. Docker Compose (root)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+
+  # 🐳 5. Dockerfile im Frontend
+  - package-ecosystem: "docker"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "docker"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+
+  # 🐳 6. Dockerfile im Backend
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "backend"
+      - "docker"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
