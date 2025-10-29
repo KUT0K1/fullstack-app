@@ -1,11 +1,13 @@
 name: Frontend CI/CD
 
 on:
-  workflow_dispatch:   # manuelles Triggern
+  workflow_dispatch:                      # manuelles Triggern
   push:
     paths:
       - 'frontend/**'                     # Änderungen am Frontend-Code
       - '.github/workflows/frontend.yml'  # Änderungen am Workflow selbst
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
   pull_request:
     paths:
       - 'frontend/**'

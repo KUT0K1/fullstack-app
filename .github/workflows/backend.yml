@@ -1,11 +1,13 @@
 name: Backend CI/CD
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:                      # manuelles Triggern
   push:
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+      - 'backend/**'                      # Änderungen am Backend-Code
+      - '.github/workflows/backend.yml'   # Änderungen am Workflow selbst
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
   pull_request:
     paths:
       - 'backend/**'
