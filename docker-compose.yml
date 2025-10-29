@@ -1,9 +1,7 @@
-version: '3.9'
-
 services:
-  db:
+  database:
     image: postgres:16
-    container_name: app-db
+#    container_name: app-db
     environment:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: secret
@@ -12,26 +10,27 @@ services:
       - db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: unless-stopped
 
   backend:
     build: ./backend
-    container_name: app-backend
+#    container_name: app-backend
     depends_on:
-      - db
+      - database
     environment:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
-    restart: always
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
-    container_name: app-frontend
+#    container_name: app-frontend
     depends_on:
       - backend
     ports:
       - "5173:80"
-    restart: always
+    restart: unless-stopped
 
 volumes:
   db-data:
