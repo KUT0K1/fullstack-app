@@ -6,8 +6,6 @@ on:
     paths:
       - 'backend/**'                      # Änderungen am Backend-Code
       - '.github/workflows/backend.yml'   # Änderungen am Workflow selbst
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
   pull_request:
     paths:
       - 'backend/**'
@@ -43,6 +41,9 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     needs: ci
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
