@@ -1,12 +1,21 @@
 name: Frontend CI/CD
 
 on:
-  workflow_dispatch:                      # manuelles Triggern
-  push:
-    paths:
-      - 'frontend/**'                     # Änderungen am Frontend-Code
-      - '.github/workflows/frontend.yml'  # Änderungen am Workflow selbst
   pull_request:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+  push:
+    branches:
+      - main
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
