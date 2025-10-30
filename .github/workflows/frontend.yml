@@ -3,7 +3,7 @@ name: Frontend CI/CD
 on:
   pull_request:
     branches:
-      - main
+      - master
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
@@ -15,7 +15,7 @@ on:
 
   push:
     branches:
-      - main
+      - master
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
