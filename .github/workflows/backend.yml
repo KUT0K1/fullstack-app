@@ -4,7 +4,7 @@ on:
   # 🔹 1. PRs, die Backend betreffen
   pull_request:
     branches:
-      - main
+      - master
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
@@ -17,7 +17,7 @@ on:
   # 🔹 2. Merge in main (nach abgeschlossenem PR)
   push:
     branches:
-      - main
+      - master
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
