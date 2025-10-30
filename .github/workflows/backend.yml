@@ -1,12 +1,23 @@
 name: Backend CI/CD
 
 on:
-  workflow_dispatch:                      # manuelles Triggern
-  push:
-    paths:
-      - 'backend/**'                      # Änderungen am Backend-Code
-      - '.github/workflows/backend.yml'   # Änderungen am Workflow selbst
+  # 🔹 1. PRs, die Backend betreffen
   pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+  # 🔹 2. Merge in main (nach abgeschlossenem PR)
+  push:
+    branches:
+      - main
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
