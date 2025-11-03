@@ -39,7 +39,7 @@ updates:
       include: "scope"
 
   # 🐳 4. Docker Compose (root)
-  - package-ecosystem: "docker"
+  - package-ecosystem: "docker-compose"
     directory: "/"
     schedule:
       interval: "weekly"
