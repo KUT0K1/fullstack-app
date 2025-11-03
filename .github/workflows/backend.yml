@@ -1,30 +1,41 @@
 name: Backend CI/CD
 
 on:
-  # 🔹 1. PRs, die Backend betreffen
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
-
-  # 🔹 2. Merge in main (nach abgeschlossenem PR)
   push:
     branches:
+      - main
       - master
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 jobs:
-  ci:
+  changes:
     runs-on: ubuntu-latest
+
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Detect backend changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - '.github/workflows/backend.yml'
+
+  ci:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
