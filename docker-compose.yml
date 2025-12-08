@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: appdb
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     ports:
       - "5432:5432"
     restart: unless-stopped

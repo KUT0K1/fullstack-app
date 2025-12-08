@@ -1,23 +1,45 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import Login from './components/Login';
+import EventList from './components/EventList';
+import './App.css';
 
 function App() {
-  const [message, setMessage] = useState('')
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  async function fetchMessage() {
-    const apiUrl = import.meta.env.DEV ? '/api/hello' : 'http://localhost:8080/api/hello'
-    const res = await fetch(apiUrl)
-    const text = await res.text()
-    setMessage(text)
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (storedUser && token) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  if (loading) {
+    return <div className="loading">Lädt...</div>;
   }
 
-  return (
-    <div className="app">
-      <h1>Willkommen zu deinem Vite + React + Spring Boot Projekt 🚀</h1>
-      <button onClick={fetchMessage}>Backend testen</button>
-      {message && <p>{message}</p>}
-    </div>
-  )
+  if (!user) {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  return <EventList user={user} onLogout={handleLogout} />;
 }
 
-export default App
+export default App;
