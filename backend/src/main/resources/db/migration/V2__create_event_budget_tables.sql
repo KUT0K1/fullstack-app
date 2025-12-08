@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS example;
 
 -- Create users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE users (
 
 -- Create events table
 CREATE TABLE events (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     adult_budget DECIMAL(10, 2) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE events (
 
 -- Create participants table
 CREATE TABLE participants (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(20) NOT NULL CHECK (type IN ('ADULT', 'CHILD')),
     custom_budget DECIMAL(10, 2),
@@ -36,7 +36,7 @@ CREATE TABLE participants (
 
 -- Create payments table
 CREATE TABLE payments (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     amount DECIMAL(10, 2) NOT NULL CHECK (amount > 0),
     payer_name VARCHAR(255) NOT NULL,
     note TEXT,
