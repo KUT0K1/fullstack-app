@@ -1,6 +1,7 @@
 package com.example.app.config;
 
 import com.example.app.security.JwtAuthenticationFilter;
+import com.example.app.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +31,13 @@ import java.util.List;
 public class SecurityConfig {
 
   private final UserDetailsService userDetailsService;
-  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtService jwtService;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    JwtAuthenticationFilter jwtAuthenticationFilter =
+        new JwtAuthenticationFilter(jwtService, userDetailsService);
+
     http.csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(
