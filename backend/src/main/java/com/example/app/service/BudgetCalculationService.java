@@ -43,22 +43,7 @@ public class BudgetCalculationService {
 
     // Budget für alle Teilnehmer berechnen
     for (Participant participant : participants) {
-      // Paare nur einmal zählen (nur wenn isCouple=true und kein Partner gesetzt oder
-      // wenn Partner gesetzt aber dieser nicht isCouple=true ist)
-      if (Boolean.TRUE.equals(participant.getIsCouple())) {
-        if (participant.getPartner() == null) {
-          // Paar ohne Partner - beide zählen als ein Paar
-          total = total.add(calculateParticipantBudget(participant, event));
-        } else {
-          // Paar mit Partner - nur einmal zählen
-          if (participant.getId() < participant.getPartner().getId()) {
-            // Nur den ersten Partner zählen
-            total = total.add(calculateParticipantBudget(participant, event));
-          }
-        }
-      } else {
-        total = total.add(calculateParticipantBudget(participant, event));
-      }
+      total = total.add(calculateParticipantBudget(participant, event));
     }
 
     // Allgemeine Kosten hinzufügen
