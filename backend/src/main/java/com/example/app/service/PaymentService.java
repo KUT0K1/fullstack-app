@@ -3,8 +3,10 @@ package com.example.app.service;
 import com.example.app.dto.CreatePaymentRequest;
 import com.example.app.dto.PaymentDto;
 import com.example.app.entity.Event;
+import com.example.app.entity.Participant;
 import com.example.app.entity.Payment;
 import com.example.app.repository.EventRepository;
+import com.example.app.repository.ParticipantRepository;
 import com.example.app.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ public class PaymentService {
 
   private final PaymentRepository paymentRepository;
   private final EventRepository eventRepository;
+  private final ParticipantRepository participantRepository;
 
   @Transactional
   public PaymentDto createPayment(Long eventId, CreatePaymentRequest request, Long userId) {
@@ -32,6 +35,25 @@ public class PaymentService {
     payment.setPayerName(request.getPayerName());
     payment.setNote(request.getNote());
     payment.setEvent(event);
+
+    // Participant zuordnen falls vorhanden
+    if (request.getParticipantId() != null) {
+      Participant participant =
+          participantRepository
+              .findById(request.getParticipantId())
+              .orElseThrow(() -> new IllegalArgumentException("Participant not found"));
+      
+      // Prüfe ob Participant zum Event gehört
+      if (!participant.getEvent().getId().equals(eventId)) {
+        throw new IllegalArgumentException("Participant does not belong to this event");
+      }
+      
+      payment.setParticipant(participant);
+      // Wenn kein payerName gesetzt ist, verwende den Participant-Namen
+      if (payment.getPayerName() == null || payment.getPayerName().isEmpty()) {
+        payment.setPayerName(participant.getName());
+      }
+    }
 
     payment = paymentRepository.save(payment);
     return mapToDto(payment);
@@ -51,6 +73,28 @@ public class PaymentService {
     payment.setPayerName(request.getPayerName());
     payment.setNote(request.getNote());
 
+    // Participant zuordnen falls vorhanden
+    if (request.getParticipantId() != null) {
+      Participant participant =
+          participantRepository
+              .findById(request.getParticipantId())
+              .orElseThrow(() -> new IllegalArgumentException("Participant not found"));
+      
+      // Prüfe ob Participant zum Event gehört
+      if (!participant.getEvent().getId().equals(payment.getEvent().getId())) {
+        throw new IllegalArgumentException("Participant does not belong to this event");
+      }
+      
+      payment.setParticipant(participant);
+      // Wenn kein payerName gesetzt ist, verwende den Participant-Namen
+      if (payment.getPayerName() == null || payment.getPayerName().isEmpty()) {
+        payment.setPayerName(participant.getName());
+      }
+    } else {
+      // Participant-Zuordnung entfernen
+      payment.setParticipant(null);
+    }
+
     payment = paymentRepository.save(payment);
     return mapToDto(payment);
   }
@@ -69,14 +113,29 @@ public class PaymentService {
   }
 
   private PaymentDto mapToDto(Payment payment) {
-    return PaymentDto.builder()
-        .id(payment.getId())
-        .amount(payment.getAmount())
-        .payerName(payment.getPayerName())
-        .note(payment.getNote())
-        .eventId(payment.getEvent().getId())
-        .createdAt(payment.getCreatedAt())
-        .build();
+    PaymentDto.PaymentDtoBuilder builder =
+        PaymentDto.builder()
+            .id(payment.getId())
+            .amount(payment.getAmount())
+            .payerName(payment.getPayerName())
+            .note(payment.getNote())
+            .eventId(payment.getEvent().getId())
+            .createdAt(payment.getCreatedAt());
+
+    // Participant-Informationen hinzufügen
+    if (payment.getParticipant() != null) {
+      Participant participant = payment.getParticipant();
+      builder.participantId(participant.getId())
+          .participantName(participant.getName());
+
+      // Partner-Informationen hinzufügen falls vorhanden
+      if (participant.getPartner() != null) {
+        builder.partnerId(participant.getPartner().getId())
+            .partnerName(participant.getPartner().getName());
+      }
+    }
+
+    return builder.build();
   }
 }
 

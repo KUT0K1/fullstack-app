@@ -50,6 +50,26 @@ public class Participant {
   @JoinColumn(name = "event_id", nullable = false)
   private Event event;
 
+  @PrePersist
+  @PreUpdate
+  protected void validateAndSetCoupleStatus() {
+    // Wenn ein Partner vorhanden ist, setze isCouple auf true
+    if (partner != null) {
+      isCouple = true;
+      // Validiere, dass ein Participant nicht sein eigener Partner sein kann
+      if (this.id != null && partner.getId() != null && partner.getId().equals(this.id)) {
+        throw new IllegalStateException("A participant cannot be their own partner");
+      }
+      // Validiere, dass beide Partner zum gleichen Event gehören
+      if (event != null && partner.getEvent() != null && !event.getId().equals(partner.getEvent().getId())) {
+        throw new IllegalStateException("Partners must belong to the same event");
+      }
+    } else {
+      // Wenn kein Partner vorhanden ist, setze isCouple auf false
+      isCouple = false;
+    }
+  }
+
   public enum ParticipantType {
     ADULT,
     CHILD

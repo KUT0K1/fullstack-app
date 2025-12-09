@@ -2,7 +2,6 @@ package com.example.app.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,9 +25,12 @@ public class Payment {
   @Column(nullable = false, precision = 10, scale = 2)
   private BigDecimal amount;
 
-  @NotBlank
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String payerName;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "participant_id", nullable = true)
+  private Participant participant;
 
   @Column(length = 500)
   private String note;
