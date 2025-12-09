@@ -176,7 +176,9 @@ function EventDetail({ event: initialEvent, onBack, onEventUpdated, onEventDelet
                     </p>
                     {participant.partnerId && (
                       <p className="partner-info">
-                        Partner: ID {participant.partnerId}
+                        Partner:{' '}
+                        {event.participants?.find((p) => p.id === participant.partnerId)?.name ||
+                          `ID ${participant.partnerId}`}
                       </p>
                     )}
                   </div>
@@ -214,6 +216,7 @@ function EventDetail({ event: initialEvent, onBack, onEventUpdated, onEventDelet
           {showPaymentForm && (
             <PaymentForm
               eventId={event.id}
+              participants={event.participants || []}
               onCancel={() => setShowPaymentForm(false)}
               onSuccess={handlePaymentCreated}
             />
@@ -222,6 +225,7 @@ function EventDetail({ event: initialEvent, onBack, onEventUpdated, onEventDelet
           {editingPayment && (
             <PaymentForm
               eventId={event.id}
+              participants={event.participants || []}
               payment={editingPayment}
               onCancel={() => setEditingPayment(null)}
               onSuccess={handlePaymentUpdated}
@@ -232,16 +236,38 @@ function EventDetail({ event: initialEvent, onBack, onEventUpdated, onEventDelet
             {event.payments?.length === 0 ? (
               <p className="empty-message">Noch keine Zahlungen</p>
             ) : (
-              event.payments?.map((payment) => (
-                <div key={payment.id} className="payment-card">
-                  <div className="payment-info">
-                    <h3>{payment.payerName}</h3>
-                    <p className="payment-amount">{payment.amount?.toFixed(2)} €</p>
-                    {payment.note && <p className="payment-note">{payment.note}</p>}
-                    <p className="payment-date">
-                      {new Date(payment.createdAt).toLocaleDateString('de-DE')}
-                    </p>
-                  </div>
+              event.payments?.map((payment) => {
+                const paymentParticipant = payment.participantId
+                  ? event.participants?.find((p) => p.id === payment.participantId)
+                  : null;
+                const paymentPartner = payment.partnerId
+                  ? event.participants?.find((p) => p.id === payment.partnerId)
+                  : null;
+
+                return (
+                  <div key={payment.id} className="payment-card">
+                    <div className="payment-info">
+                      <h3>
+                        {payment.payerName}
+                        {paymentParticipant && (
+                          <span className="participant-badge">
+                            {paymentParticipant.name}
+                            {paymentPartner && ` & ${paymentPartner.name}`}
+                          </span>
+                        )}
+                      </h3>
+                      <p className="payment-amount">{payment.amount?.toFixed(2)} €</p>
+                      {paymentParticipant && (
+                        <p className="payment-participant">
+                          Teilnehmer: {paymentParticipant.name}
+                          {paymentPartner && ` & ${paymentPartner.name} (Paar)`}
+                        </p>
+                      )}
+                      {payment.note && <p className="payment-note">{payment.note}</p>}
+                      <p className="payment-date">
+                        {new Date(payment.createdAt).toLocaleDateString('de-DE')}
+                      </p>
+                    </div>
                   <div className="payment-actions">
                     <button
                       onClick={() => setEditingPayment(payment)}
@@ -257,8 +283,8 @@ function EventDetail({ event: initialEvent, onBack, onEventUpdated, onEventDelet
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+              )}
+            ))}
           </div>
         </div>
       </div>
@@ -277,6 +303,20 @@ function ParticipantForm({ eventId, participants, participant, onCancel, onSucce
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Verfügbare Partner: alle Participants außer dem aktuell bearbeiteten
+  const availablePartners = participants.filter(
+    (p) => p.id !== participant?.id && p.type === 'ADULT'
+  );
+
+  const handlePartnerChange = (partnerId) => {
+    const newPartnerId = partnerId === '' ? '' : partnerId;
+    setFormData({
+      ...formData,
+      partnerId: newPartnerId,
+      isCouple: newPartnerId !== '', // Automatisch isCouple setzen wenn Partner ausgewählt
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -333,16 +373,23 @@ function ParticipantForm({ eventId, participants, participant, onCancel, onSucce
             </select>
           </div>
           <div className="form-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={formData.isCouple}
-                onChange={(e) =>
-                  setFormData({ ...formData, isCouple: e.target.checked })
-                }
-              />
-              Als Paar werten
-            </label>
+            <label>Partner (optional)</label>
+            <select
+              value={formData.partnerId}
+              onChange={(e) => handlePartnerChange(e.target.value)}
+            >
+              <option value="">Kein Partner</option>
+              {availablePartners.map((p) => (
+                <option key={p.id} value={p.id.toString()}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            {formData.partnerId && (
+              <p className="form-hint">
+                Als Paar gewertet (wird automatisch gesetzt)
+              </p>
+            )}
           </div>
           <div className="form-group">
             <label>Individuelles Budget (€) - optional</label>
@@ -353,16 +400,6 @@ function ParticipantForm({ eventId, participants, participant, onCancel, onSucce
               value={formData.customBudget}
               onChange={(e) =>
                 setFormData({ ...formData, customBudget: e.target.value })
-              }
-            />
-          </div>
-          <div className="form-group">
-            <label>Partner ID (optional)</label>
-            <input
-              type="number"
-              value={formData.partnerId}
-              onChange={(e) =>
-                setFormData({ ...formData, partnerId: e.target.value })
               }
             />
           </div>
@@ -390,14 +427,34 @@ function ParticipantForm({ eventId, participants, participant, onCancel, onSucce
   );
 }
 
-function PaymentForm({ eventId, payment, onCancel, onSuccess }) {
+function PaymentForm({ eventId, participants, payment, onCancel, onSuccess }) {
   const [formData, setFormData] = useState({
     amount: payment?.amount?.toString() || '',
     payerName: payment?.payerName || '',
+    participantId: payment?.participantId?.toString() || '',
     note: payment?.note || '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Verfügbare Participants (nur Erwachsene, da nur diese zahlen können)
+  const availableParticipants = participants.filter((p) => p.type === 'ADULT');
+
+  const handleParticipantChange = (participantId) => {
+    const newParticipantId = participantId === '' ? '' : participantId;
+    const selectedParticipant = participants.find(
+      (p) => p.id.toString() === newParticipantId
+    );
+    
+    setFormData({
+      ...formData,
+      participantId: newParticipantId,
+      // Automatisch payerName setzen wenn Participant ausgewählt
+      payerName: selectedParticipant
+        ? selectedParticipant.name
+        : formData.payerName,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -407,7 +464,8 @@ function PaymentForm({ eventId, payment, onCancel, onSuccess }) {
     try {
       const data = {
         amount: parseFloat(formData.amount),
-        payerName: formData.payerName,
+        payerName: formData.payerName || null,
+        participantId: formData.participantId ? parseInt(formData.participantId) : null,
         note: formData.note || null,
       };
 
@@ -431,13 +489,39 @@ function PaymentForm({ eventId, payment, onCancel, onSuccess }) {
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Zahler Name *</label>
+            <label>Teilnehmer (optional)</label>
+            <select
+              value={formData.participantId}
+              onChange={(e) => handleParticipantChange(e.target.value)}
+            >
+              <option value="">Kein Teilnehmer</option>
+              {availableParticipants.map((p) => (
+                <option key={p.id} value={p.id.toString()}>
+                  {p.name}
+                  {p.partnerId && ` (Paar mit ${participants.find((partner) => partner.id === p.partnerId)?.name || 'Partner'})`}
+                </option>
+              ))}
+            </select>
+            {formData.participantId && (
+              <p className="form-hint">
+                Der Name wird automatisch aus dem Teilnehmer übernommen
+              </p>
+            )}
+          </div>
+          <div className="form-group">
+            <label>Zahler Name {!formData.participantId && '*'}</label>
             <input
               type="text"
               value={formData.payerName}
               onChange={(e) => setFormData({ ...formData, payerName: e.target.value })}
-              required
+              required={!formData.participantId}
+              disabled={!!formData.participantId}
             />
+            {formData.participantId && (
+              <p className="form-hint">
+                Wird automatisch aus dem Teilnehmer übernommen
+              </p>
+            )}
           </div>
           <div className="form-group">
             <label>Betrag (€) *</label>
