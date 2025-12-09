@@ -1,4 +1,4 @@
-package com.example.app.config;
+package com.example.app.service;
 
 import com.example.app.entity.User;
 import com.example.app.repository.UserRepository;

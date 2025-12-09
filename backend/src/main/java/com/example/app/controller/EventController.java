@@ -3,6 +3,7 @@ package com.example.app.controller;
 import com.example.app.dto.CreateEventRequest;
 import com.example.app.dto.EventDto;
 import com.example.app.security.CurrentUser;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
+@SecurityRequirement(name = "bearerAuth")
 public class EventController {
 
   private final com.example.app.service.EventService eventService;

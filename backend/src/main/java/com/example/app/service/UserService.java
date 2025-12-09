@@ -60,7 +60,7 @@ public class UserService {
     User user =
         userRepository
             .findByUsername(request.getUsername())
-            .orElseThrow(() -> null);
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
     return LoginResponse.builder()
         .token(token)

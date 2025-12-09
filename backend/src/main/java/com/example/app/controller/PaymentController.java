@@ -3,6 +3,7 @@ package com.example.app.controller;
 import com.example.app.dto.CreatePaymentRequest;
 import com.example.app.dto.PaymentDto;
 import com.example.app.security.CurrentUser;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/events/{eventId}/payments")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
+@SecurityRequirement(name = "bearerAuth")
 public class PaymentController {
 
   private final com.example.app.service.PaymentService paymentService;
